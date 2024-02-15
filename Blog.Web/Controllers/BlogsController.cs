@@ -10,6 +10,8 @@ namespace Blog.Web.Controllers;
 
 public class BlogsController : Controller
 {
+
+
     private readonly IBlogPostRepository _blogPostRepository;
 
     public BlogsController(IBlogPostRepository blogPostRepository)
@@ -61,6 +63,9 @@ public class BlogsController : Controller
 
         return View(blogPosts);
     }
+
+    [ModelBinder(Name = "FeaturedImage")]
+    public IFormFile FeaturedImage { get; set; }
 
     [HttpGet]
     public IActionResult Edit([FromRoute] Guid id)
