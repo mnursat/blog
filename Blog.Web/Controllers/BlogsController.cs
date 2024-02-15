@@ -1,18 +1,20 @@
 ﻿using Blog.Web.Data;
 using Blog.Web.Models.Domain;
 using Blog.Web.Models.ViewModels;
+using Blog.Web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Blog.Web.Controllers;
 
 public class BlogsController : Controller
 {
-    private readonly BlogDbContext _blogDbContext;
+    private readonly IBlogPostRepository _blogPostRepository;
 
-    public BlogsController(BlogDbContext blogDbContext)
+    public BlogsController(IBlogPostRepository blogPostRepository)
     {
-        _blogDbContext = blogDbContext;
+        _blogPostRepository = blogPostRepository;
     }
 
     [HttpGet]
@@ -37,10 +39,11 @@ public class BlogsController : Controller
             Visible = blog.Visible,
         };
 
-        _blogDbContext.BLogPosts.Add(blogPost);
-        _blogDbContext.SaveChanges();
+        _blogPostRepository.Add(blogPost);
 
-        TempData["SuccessCreated"] = "New blog post successfully create.";
+        var notification = new Notification() { Message = "New blog created.", Type = Enums.NotificationType.Success };
+
+        TempData["Notification"] = JsonSerializer.Serialize(notification);
 
         return RedirectToAction(nameof(List));
     }
@@ -48,12 +51,12 @@ public class BlogsController : Controller
     [HttpGet]
     public IActionResult List()
     {
-        var blogPosts = _blogDbContext.BLogPosts.ToList();
-        var messageDescription = TempData["SuccessCreated"];
+        var blogPosts = _blogPostRepository.GetAll();
+        var notificationJson = (string)TempData["Notification"];
 
-        if (messageDescription is not null)
+        if (notificationJson is not null)
         {
-            ViewBag.MessageDescription = messageDescription;
+            ViewBag.Notification = JsonSerializer.Deserialize<Notification>(notificationJson);
         }
 
         return View(blogPosts);
@@ -62,7 +65,7 @@ public class BlogsController : Controller
     [HttpGet]
     public IActionResult Edit([FromRoute] Guid id)
     {
-        var blogPost = _blogDbContext.BLogPosts.Find(id);
+        var blogPost = _blogPostRepository.Get(id);
 
 
         return View(blogPost);
@@ -71,25 +74,15 @@ public class BlogsController : Controller
     [HttpPost]
     public IActionResult Edit([FromForm] BlogPost blogPost)
     {
-        var existingBlogPost = _blogDbContext.BLogPosts.FirstOrDefault(p => p.Id == blogPost.Id);
-
-        if (existingBlogPost is not null)
+        try
         {
-            existingBlogPost.Heading = blogPost.Heading;
-            existingBlogPost.PageTitle = blogPost.PageTitle;
-            existingBlogPost.Content = blogPost.Content;
-            existingBlogPost.ShortDescription = blogPost.ShortDescription;
-            existingBlogPost.FeaturedImageUrl = blogPost.FeaturedImageUrl;
-            existingBlogPost.UrlHandle = blogPost.UrlHandle;
-            existingBlogPost.PublishedDate = blogPost.PublishedDate;
-            existingBlogPost.Author = blogPost.Author;
-            existingBlogPost.Visible = blogPost.Visible;
-
-            _blogDbContext.SaveChanges();
+            _blogPostRepository.Update(blogPost);
 
             ViewBag.Notification = new Notification { Message = "Successfully edited.", Type = Enums.NotificationType.Success };
-
-            return View(existingBlogPost);
+        }
+        catch (Exception ex)
+        {
+            ViewBag.Notification = new Notification { Message = "Something went wrong.", Type = Enums.NotificationType.Error };
         }
 
         return View(blogPost);
@@ -98,17 +91,18 @@ public class BlogsController : Controller
     [HttpPost]
     public IActionResult Delete([FromForm] BlogPost blogPost)
     {
-        var blog = _blogDbContext.BLogPosts
-            .AsNoTracking()
-            .FirstOrDefault(b => b.Id == blogPost.Id);
+        var deleted = _blogPostRepository.Delete(blogPost.Id);
 
-        if (blog is null)
+        if (deleted)
         {
-            return View();
+            var notification = new Notification { Message = "Post successfully delete", Type = Enums.NotificationType.Success };
+
+            TempData["Notification"] = JsonSerializer.Serialize(notification);
+
+            return RedirectToAction(nameof(List));
         }
 
-        _blogDbContext.BLogPosts.Remove(blog);
-        _blogDbContext.SaveChanges();
-        return RedirectToAction(nameof(List));
+        return View(blogPost);
+
     }
 }
