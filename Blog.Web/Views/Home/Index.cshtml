@@ -1,8 +1,52 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<BlogPost>
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container px-4 py-5">
+    <div class="row align-items-center g-5 py-5">
+        <div class="col-12 col-lg-6">
+            <h1 class="display-5 fw-bold lh-1 mb-3">
+                Blog dev
+            </h1>
+            <p class="lead">
+                Why do we use it?
+                It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
+                The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here',
+                making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text,
+                and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by
+                accident, sometimes on purpose (injected humour and the like).
+            </p>
+        </div>
+        <div class="col-12 col-lg-6">
+            <img src="https://4kwallpapers.com/images/walls/thumbs_3t/13640.png"
+                 class="d-block mx-lg-auto img-fluid" width="600" />
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-6">
+            @if (Model is not null && Model.Any())
+            {
+                @foreach (var blog in Model)
+                {
+                    <div class="mb-5 bg-light box-shadow">
+                        <img src="@blog.FeaturedImageUrl" alt="@blog.Heading" class="mb-2 d-block img-fluid" />
+                        <div class="px-4 py-4">
+                            <h2 class="mb-2">@blog.Heading</h2>
+                            <p>
+                                Author: @blog.Author
+                                <br />
+                                Date Published: @blog.PublishedDate.ToShortDateString()
+                            </p>
+                            <p class="mb-2">@blog.ShortDescription</p>
+                            <a asp-controller="Blogs" asp-action="Details" asp-route-urlHandle="@blog.UrlHandle" class="btn btn-dark">Read more</a>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
 </div>

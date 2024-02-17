@@ -31,6 +31,11 @@ public class BlogPostRepository : IBlogPostRepository
         return _blogDbContext.BLogPosts.Find(id);
     }
 
+    public BlogPost Get(string urlHandle)
+    {
+        return _blogDbContext.BLogPosts.FirstOrDefault(bp => bp.UrlHandle == urlHandle)!;
+    }
+
     public BlogPost Update(BlogPost blogPost)
     {
         var existingBlogPost = _blogDbContext.BLogPosts.Find(blogPost.Id);

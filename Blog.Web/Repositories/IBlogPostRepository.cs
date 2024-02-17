@@ -6,6 +6,7 @@ public interface IBlogPostRepository
 {
     ICollection<BlogPost> GetAll();
     BlogPost Get(Guid id);
+    BlogPost Get(string urlHandle);
     BlogPost Add(BlogPost blogPost);
     BlogPost Update(BlogPost blogPost);
     bool Delete(Guid id);
