@@ -28,7 +28,7 @@ public class BlogPostRepository : IBlogPostRepository
 
     public BlogPost Get(Guid id)
     {
-        return _blogDbContext.BLogPosts.Find(id);
+        return _blogDbContext.BLogPosts.Include(nameof(BlogPost.Tags)).FirstOrDefault(bp => bp.Id ==  id);
     }
 
     public BlogPost Get(string urlHandle)
@@ -51,6 +51,8 @@ public class BlogPostRepository : IBlogPostRepository
             existingBlogPost.PublishedDate = blogPost.PublishedDate;
             existingBlogPost.Author = blogPost.Author;
             existingBlogPost.Visible = blogPost.Visible;
+            
+
 
         }
         _blogDbContext.SaveChanges();

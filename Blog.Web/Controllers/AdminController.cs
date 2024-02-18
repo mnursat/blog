@@ -1,11 +1,13 @@
 ﻿using Blog.Web.Models.Domain;
 using Blog.Web.Models.ViewModels;
 using Blog.Web.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace Blog.Web.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     private readonly IBlogPostRepository _blogPostRepository;
@@ -35,6 +37,7 @@ public class AdminController : Controller
             PublishedDate = blog.PublishedDate,
             Author = blog.Author,
             Visible = blog.Visible,
+            Tags = new List<Tag>(blog.Tags.Split(',').Select(x => new Tag() { Name = x.Trim() })),
         };
 
         _blogPostRepository.Add(blogPost);
@@ -63,10 +66,17 @@ public class AdminController : Controller
     [ModelBinder(Name = "FeaturedImage")]
     public IFormFile FeaturedImage { get; set; }
 
+
     [HttpGet]
     public IActionResult EditBlog([FromRoute] Guid id)
     {
         var blogPost = _blogPostRepository.Get(id);
+        var tags = blogPost.Tags.Select(x => x.Name);
+
+        if (blogPost.Tags is not null && blogPost is not null)
+        {
+            ViewBag.Tags = string.Join(",", tags);
+        }
 
 
         return View("./Blogs/Edit", blogPost);

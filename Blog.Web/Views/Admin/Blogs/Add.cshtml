@@ -42,7 +42,7 @@
 
         <div class="mb-3">
             <label for="featureImageUrl" class="form-label">Feature Image URL</label>
-            <input type="text" class="form-control" id="featureImageUrl" asp-for="@Model.FeaturedImageUrl" readonly>
+            <input type="text" class="form-control" id="featureImageUrl" asp-for="@Model.FeaturedImageUrl">
         </div>
 
         <div class="mb-3">
@@ -58,6 +58,11 @@
         <div class="mb-3">
             <label for="author" class="form-label">Author</label>
             <input type="text" class="form-control" id="author" asp-for="@Model.Author">
+        </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags (,)</label>
+            <input type="text" class="form-control" id="tags" asp-for="@Model.Tags">
         </div>
 
         <div class="form-check mb-3">

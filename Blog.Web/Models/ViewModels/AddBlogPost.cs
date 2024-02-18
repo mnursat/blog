@@ -12,4 +12,5 @@ public class AddBlogPost
     public DateTime PublishedDate { get; set; }
     public string Author { get; set; }
     public bool Visible { get; set; }
+    public string Tags { get; set; }
 }

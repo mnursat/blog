@@ -7,12 +7,10 @@ namespace Blog.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IBlogPostRepository _blogPostRepository;
 
-        public HomeController(ILogger<HomeController> logger, IBlogPostRepository blogPostRepository)
+        public HomeController(IBlogPostRepository blogPostRepository)
         {
-            _logger = logger;
             _blogPostRepository = blogPostRepository;
         }
 
@@ -20,11 +18,6 @@ namespace Blog.Web.Controllers
         {
             var blogs = _blogPostRepository.GetAll();
             return View(blogs);
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
